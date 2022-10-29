@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -39,7 +40,12 @@ func TestRegisterHandlerSuite(t *testing.T) {
 }
 
 func (s *RegisterHandlerSuite) SetupTest() {
-	s.request = httptest.NewRequest("POST", "http://test.com/v1/register", strings.NewReader("first_name=john&last_name=doe&email=john.doe@email.com&password=verysecure"))
+	form := url.Values{}
+	form.Add("first_name", "john")
+	form.Add("last_name", "doe")
+	form.Add("email", "john.doe@email.com")
+	form.Add("password", "verysecure")
+	s.request = httptest.NewRequest("POST", "http://test.com/v1/register", strings.NewReader(form.Encode()))
 	s.request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	s.responseWriter = httptest.NewRecorder()

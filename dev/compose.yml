@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  mysql:
+    image: mysql:8.0.31
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: example
+      MYSQL_USER: example
+      MYSQL_PASSWORD: example
+    ports:
+      - 3306:3306
+
+volumes:
+  db:

@@ -26,5 +26,17 @@ compose:
 generate:
 	@go generate ./...
 
+setup-env:
+	@cp env.sample .env
+	@rm -f ./dev/private_key ./dev/public_key
+	@ssh-keygen -t rsa -b 4096 -f ./dev/private_key -o -a 100 -m PEM < /dev/null
+	@chmod 600 ./dev/private_key.pub
+	@ssh-keygen -f ./dev/private_key.pub -e -m PEM > ./dev/public_key
+	@rm -f ./dev/private_key.pub
+
 test:
-	@go test ./...
+	@go test -race -cover -coverprofile=coverage.out \
+	$(shell go list ./... | grep -v integration_test)
+
+integration-test:
+	@go test littlerollingsushi.com/example/integration_test

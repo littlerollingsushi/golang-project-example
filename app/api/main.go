@@ -10,10 +10,13 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/joho/godotenv"
+
 	httptreemux "github.com/dimfeld/httptreemux/v5"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/kelseyhightower/envconfig"
-	"littlerollingsushi.com/example/usecase/registration/constructor"
+	loginConstructor "littlerollingsushi.com/example/usecase/login/constructor"
+	registrationConstructor "littlerollingsushi.com/example/usecase/registration/constructor"
 )
 
 type SqlConfig struct {
@@ -37,6 +40,8 @@ func (c *SqlConfig) DSN() string {
 }
 
 func main() {
+	_ = godotenv.Load(".env")
+
 	sqlConfig := SqlConfig{}
 	envconfig.Process("sql", &sqlConfig)
 	db, err := sql.Open(sqlConfig.Driver, sqlConfig.DSN())
@@ -46,7 +51,8 @@ func main() {
 	defer db.Close()
 
 	handler := httptreemux.New()
-	handler.POST("/v1/register", constructor.ConstructRegisterHandler(db).Register)
+	handler.POST("/v1/register", registrationConstructor.ConstructRegisterHandler(db).Register)
+	handler.POST("/v1/login", loginConstructor.ConstructLoginHandler(db).Login)
 
 	server := &http.Server{
 		Addr:           ":7070",
